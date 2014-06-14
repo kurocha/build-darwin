@@ -14,9 +14,17 @@ define_target "build-darwin" do |target|
 			output :library_file, pattern: /\.a/
 			
 			apply do |parameters|
+				input_root = parameters[:library_file].root
+				object_files = parameters[:object_files].collect{|path| path.shortest_path(input_root)}
+				
 				run!(
-					environment[:libtool] || "libtool", *environment[:ldflags],
-					"-static", "-o", parameters[:library_file], "-c", *parameters[:object_files]
+					environment[:libtool] || "libtool", 
+					"-static",
+					"-o", parameters[:library_file].relative_path,
+					"-c", *object_files,
+					*environment[:ldflags],
+					"-L" + (environment[:install_prefix] + "lib").shortest_path(input_root),
+					chdir: input_root
 				)
 			end
 		end
@@ -26,24 +34,36 @@ define_target "build-darwin" do |target|
 			output :library_file, pattern: /\.(dylib)$/
 			
 			apply do |parameters|
+				input_root = parameters[:library_file].root
+				object_files = parameters[:object_files].collect{|path| path.shortest_path(input_root)}
+				
 				run!(
 					environment[:libtool] || "libtool",
-					"-dynamic", "-o", parameters[:library_file], *parameters[:object_files],
-					*environment[:ldflags]
+					"-dynamic",
+					"-o", parameters[:library_file].relative_path,
+					"-c", *object_files,
+					*environment[:ldflags],
+					"-L" + (environment[:install_prefix] + "lib").shortest_path(input_root),
+					chdir: input_root
 				)
 			end
 		end
 		
-		define Rule, "link.darwin-executable-cpp" do
+		define Rule, "link.darwin-executable" do
 			input :object_files, pattern: /\.o$/, multiple: true
 			output :executable_file
 			
 			apply do |parameters|
+				input_root = parameters[:executable_file].root
+				object_files = parameters[:object_files].collect{|path| path.shortest_path(input_root)}
+				
 				run!(
-					environment[:cxx],
-					environment[:cxxflags],
-					"-o", parameters[:executable_file], parameters[:object_files],
-					environment[:ldflags]
+					"clang++",
+					"-o", parameters[:executable_file],
+					*parameters[:object_files],
+					*environment[:ldflags],
+					"-L" + (environment[:install_prefix] + "lib").shortest_path(input_root),
+					chdir: input_root
 				)
 			end
 		end
