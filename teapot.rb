@@ -65,5 +65,59 @@ define_target "build-darwin" do |target|
 				build source_files: parameters[:source_files], library_file: parameters[:library_file]
 			end
 		end
+		
+		define Rule, "build.dynamic-library" do
+			input :source_files
+			
+			parameter :prefix
+			parameter :static_library
+			
+			output :library_file, implicit: true do |arguments|
+				arguments[:prefix] + "lib" + "lib#{arguments[:static_library]}.dylib"
+			end
+			
+			apply do |parameters|
+				# Make sure the output directory exists:
+				fs.mkpath File.dirname(parameters[:library_file])
+				
+				build source_files: parameters[:source_files], library_file: parameters[:library_file]
+			end
+		end
+		
+		define Rule, "build.executable" do
+			input :source_files
+			
+			parameter :prefix
+			parameter :executable
+			
+			output :executable_file, implicit: true do |arguments|
+				arguments[:prefix] + "bin" + arguments[:executable]
+			end
+			
+			apply do |parameters|
+				# Make sure the output directory exists:
+				fs.mkpath File.dirname(parameters[:executable_file])
+				
+				build source_files: parameters[:source_files], executable_file: parameters[:executable_file]
+			end
+		end
+		
+		define Rule, "run.executable" do
+			input :executable_path, implicit: true do |arguments|
+				arguments[:prefix] + "bin" + arguments[:executable]
+			end
+			
+			parameter :executable
+			
+			parameter :prefix
+			parameter :args, optional: true
+			
+			apply do |parameters|
+				run!(
+					parameters[:executable_path],
+					*parameters[:arguments]
+				)
+			end
+		end
 	end
 end
