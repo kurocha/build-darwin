@@ -40,7 +40,7 @@ define_target "build-darwin" do |target|
 				libraries = environment[:ldflags].collect{|option| option.to_s[/(?<=^-l).+/]}
 				
 				libraries.compact.collect do |name|
-					archive_name = arguments[:library_path] + "lib#{name}.a"
+					archive_name = arguments[:library_path] / "lib#{name}.a"
 				end
 			end
 			
@@ -55,7 +55,7 @@ define_target "build-darwin" do |target|
 					"-o", parameters[:executable_file].relative_path,
 					*object_files,
 					*environment[:ldflags],
-					"-L" + (parameters[:library_path]).shortest_path(input_root),
+					"-L" + parameters[:library_path].shortest_path(input_root),
 					chdir: input_root
 				)
 			end
@@ -71,7 +71,7 @@ define_target "build-darwin" do |target|
 			parameter :static_library
 			
 			output :library_file, implicit: true do |arguments|
-				arguments[:prefix] + "lib#{arguments[:static_library]}.a"
+				arguments[:prefix] / "lib#{arguments[:static_library]}.a"
 			end
 			
 			apply do |parameters|
@@ -92,7 +92,7 @@ define_target "build-darwin" do |target|
 			parameter :executable
 			
 			output :executable_file, implicit: true do |arguments|
-				arguments[:prefix] + arguments[:executable]
+				arguments[:prefix] / arguments[:executable]
 			end
 			
 			apply do |parameters|
@@ -111,7 +111,7 @@ define_target "build-darwin" do |target|
 			end
 			
 			input :executable_path, implicit: true do |arguments|
-				arguments[:prefix] + arguments[:executable]
+				arguments[:prefix] / arguments[:executable]
 			end
 			
 			parameter :args, optional: true
