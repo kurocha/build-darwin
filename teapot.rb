@@ -12,20 +12,6 @@ define_target "build-darwin" do |target|
 		define Rule, "link.darwin-static-library" do
 			input :object_files, pattern: /\.o/, multiple: true
 			
-			parameter :library_path, optional: true do |path, arguments|
-				arguments[:library_path] = path || (environment[:install_prefix] + "lib")
-			end
-			
-			# Library dependencies are hard to get right especially if multiple -L paths are specified. This is because technically, the library might be found in any of the specified paths, which means if any path is added or removed it might change the output. We ignore those hard (impossible?) cases and only monitor the install prefix.
-			input :dependencies, implicit: true do |arguments|
-				# Extract include directories:
-				libraries = environment[:ldflags].collect{|option| option.to_s[/(?<=^-l).+/]}
-				
-				libraries.compact.collect do |name|
-					archive_name = arguments[:library_path] + "lib#{name}.a"
-				end
-			end
-			
 			output :library_file, pattern: /\.a/
 			
 			apply do |parameters|
@@ -37,8 +23,6 @@ define_target "build-darwin" do |target|
 					"-static",
 					"-o", parameters[:library_file].relative_path,
 					"-c", *object_files,
-					*environment[:ldflags],
-					"-L" + parameters[:library_path].shortest_path(input_root),
 					chdir: input_root
 				)
 			end
