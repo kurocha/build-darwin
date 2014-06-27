@@ -110,7 +110,7 @@ define_target "build-darwin" do |target|
 				arguments[:prefix] = path || (environment[:install_prefix] + "bin")
 			end
 			
-			input :executable_path, implicit: true do |arguments|
+			input :executable_file, implicit: true do |arguments|
 				arguments[:prefix] / arguments[:executable]
 			end
 			
@@ -118,7 +118,7 @@ define_target "build-darwin" do |target|
 			
 			apply do |parameters|
 				run!(
-					parameters[:executable_path],
+					parameters[:executable_file],
 					*parameters[:arguments]
 				)
 			end
