@@ -110,7 +110,7 @@ define_target "build-darwin" do |target|
 				arguments[:prefix] / arguments[:executable]
 			end
 			
-			parameter :args, optional: true
+			parameter :arguments, optional: true
 			
 			apply do |parameters|
 				run!(
