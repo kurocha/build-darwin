@@ -19,7 +19,7 @@ define_target "build-darwin" do |target|
 				object_files = parameters[:object_files].collect{|path| path.shortest_path(input_root)}
 				
 				run!(
-					environment[:libtool] || "libtool", 
+					environment[:libtool] || "libtool",
 					"-static",
 					"-o", parameters[:library_file].relative_path,
 					"-c", *object_files,
@@ -47,7 +47,7 @@ define_target "build-darwin" do |target|
 				object_files = parameters[:object_files].collect{|path| path.shortest_path(input_root)}
 				
 				run!(
-					"clang++",
+					environment[:cxx] || "clang++",
 					"-o", parameters[:executable_file].relative_path,
 					*object_files,
 					*environment[:ldflags],
