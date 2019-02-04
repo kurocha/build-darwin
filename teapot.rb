@@ -3,7 +3,7 @@
 #  This file is part of the "Teapot" project, and is released under the MIT license.
 #
 
-teapot_version "1.0.0"
+teapot_version "3.0"
 
 define_target "build-darwin" do |target|
 	target.provides :linker => "Build/darwin"
@@ -32,7 +32,7 @@ define_target "build-darwin" do |target|
 			input :object_files, pattern: /\.o$/, multiple: true
 			
 			parameter :library_path, optional: true do |path, arguments|
-				arguments[:library_path] = path || (environment[:install_prefix] + "lib")
+				arguments[:library_path] = environment[:build_prefix] + path + "lib"
 			end
 			
 			input :dependencies, implicit: true do |arguments|
@@ -61,20 +61,20 @@ define_target "build-darwin" do |target|
 			input :source_files
 			
 			parameter :prefix, optional: true do |path, arguments|
-				arguments[:prefix] = path || (environment[:install_prefix] + "lib")
+				arguments[:prefix] = environment[:build_prefix] + path
 			end
 			
 			parameter :static_library
 			
 			output :library_file, implicit: true do |arguments|
-				arguments[:prefix] / "lib#{arguments[:static_library]}.a"
+				arguments[:prefix] / "#{arguments[:static_library]}.a"
 			end
 			
 			apply do |parameters|
 				# Make sure the output directory exists:
 				fs.mkpath File.dirname(parameters[:library_file])
 				
-				build source_files: parameters[:source_files], library_file: parameters[:library_file]
+				build build_prefix: parameters[:prefix], source_files: parameters[:source_files], library_file: parameters[:library_file]
 			end
 		end
 		
@@ -82,20 +82,20 @@ define_target "build-darwin" do |target|
 			input :source_files
 			
 			parameter :prefix, optional: true do |path, arguments|
-				arguments[:prefix] = path || (environment[:install_prefix] + "bin")
+				arguments[:prefix] = environment[:build_prefix] + path
 			end
 			
 			parameter :executable
 			
 			output :executable_file, implicit: true do |arguments|
-				arguments[:prefix] / arguments[:executable]
+				arguments[:prefix] / "bin" + arguments[:executable]
 			end
 			
 			apply do |parameters|
 				# Make sure the output directory exists:
 				fs.mkpath File.dirname(parameters[:executable_file])
 				
-				build source_files: parameters[:source_files], executable_file: parameters[:executable_file]
+				build build_prefix: parameters[:prefix], source_files: parameters[:source_files], executable_file: parameters[:executable_file]
 			end
 		end
 		
@@ -103,7 +103,7 @@ define_target "build-darwin" do |target|
 			parameter :executable
 			
 			parameter :prefix, optional: true do |path, arguments|
-				arguments[:prefix] = path || (environment[:install_prefix] + "bin")
+				arguments[:prefix] = environment[:build_prefix] + path
 			end
 			
 			input :executable_file, implicit: true do |arguments|
