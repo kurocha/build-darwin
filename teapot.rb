@@ -82,13 +82,13 @@ define_target "build-darwin" do |target|
 			input :source_files
 			
 			parameter :prefix, optional: true do |path, arguments|
-				arguments[:prefix] = environment[:build_prefix] + path
+				arguments[:prefix] = environment[:build_prefix] + path + 'bin'
 			end
 			
 			parameter :executable
 			
 			output :executable_file, implicit: true do |arguments|
-				arguments[:prefix] / "bin" + arguments[:executable]
+				arguments[:prefix] / arguments[:executable]
 			end
 			
 			apply do |parameters|
@@ -103,7 +103,7 @@ define_target "build-darwin" do |target|
 			parameter :executable
 			
 			parameter :prefix, optional: true do |path, arguments|
-				arguments[:prefix] = environment[:build_prefix] + path
+				arguments[:prefix] = environment[:build_prefix] + path + 'bin'
 			end
 			
 			input :executable_file, implicit: true do |arguments|
