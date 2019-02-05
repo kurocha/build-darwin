@@ -36,7 +36,7 @@ define_target "build-darwin" do |target|
 			end
 			
 			input :dependencies, implicit: true do |arguments|
-				# Extract include directories:
+				# Extract library paths:
 				libraries = environment[:ldflags].select{|option| option.kind_of? Files::Path}
 			end
 			
