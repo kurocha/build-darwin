@@ -25,6 +25,8 @@ define_target "build-darwin" do |target|
 					"-c", *object_files,
 					chdir: input_root
 				)
+				
+				touch parameters[:library_file]
 			end
 		end
 		
