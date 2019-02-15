@@ -3,10 +3,13 @@
 #  This file is part of the "Teapot" project, and is released under the MIT license.
 #
 
-teapot_version "2.3"
+teapot_version "3.0"
 
 define_target "build-darwin" do |target|
+	target.depends :platform, public: true
+	
 	target.provides :linker => "Build/darwin"
+	target.provides :executor => "Build/darwin"
 	
 	target.provides "Build/darwin" do
 		define Rule, "link.darwin-static-library" do
