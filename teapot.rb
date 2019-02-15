@@ -36,12 +36,7 @@ define_target "build-darwin" do |target|
 		define Rule, "link.darwin-executable" do
 			input :object_files, pattern: /\.o$/, multiple: true
 			
-			parameter :library_path, optional: true do |path, arguments|
-				arguments[:library_path] = environment[:build_prefix] + path + "lib"
-			end
-			
 			input :dependencies, implicit: true do |arguments|
-				# Extract library paths:
 				libraries = environment[:ldflags].select{|option| option.kind_of? Files::Path}
 			end
 			
@@ -56,7 +51,6 @@ define_target "build-darwin" do |target|
 					"-o", parameters[:executable_file].relative_path,
 					*object_files,
 					*environment[:ldflags],
-					# "-L" + parameters[:library_path].shortest_path(input_root),
 					chdir: input_root
 				)
 			end
@@ -65,8 +59,8 @@ define_target "build-darwin" do |target|
 		define Rule, "build.static-library" do
 			input :source_files
 			
-			parameter :prefix, optional: true do |path, arguments|
-				arguments[:prefix] = environment[:build_prefix] + path
+			parameter :prefix, implicit: true do |arguments|
+				arguments[:prefix] = environment[:build_prefix] + environment.checksum
 			end
 			
 			parameter :static_library
@@ -86,8 +80,8 @@ define_target "build-darwin" do |target|
 		define Rule, "build.executable" do
 			input :source_files
 			
-			parameter :prefix, optional: true do |path, arguments|
-				arguments[:prefix] = environment[:build_prefix] + path + 'bin'
+			parameter :prefix, implicit: true do |arguments|
+				arguments[:prefix] = environment[:build_prefix] + environment.checksum
 			end
 			
 			parameter :executable
@@ -107,8 +101,8 @@ define_target "build-darwin" do |target|
 		define Rule, "run.executable" do
 			parameter :executable
 			
-			parameter :prefix, optional: true do |path, arguments|
-				arguments[:prefix] = environment[:build_prefix] + path + 'bin'
+			parameter :prefix, implicit: true do |arguments|
+				arguments[:prefix] = environment[:build_prefix] + environment.checksum
 			end
 			
 			input :executable_file, implicit: true do |arguments|
