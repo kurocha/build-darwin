@@ -9,7 +9,6 @@ define_target "build-darwin" do |target|
 	target.depends :platform, public: true
 	
 	target.provides :linker => "Build/darwin"
-	target.provides :executor => "Build/darwin"
 	
 	target.provides "Build/darwin" do
 		define Rule, "link.darwin-static-library" do
@@ -95,24 +94,6 @@ define_target "build-darwin" do |target|
 				mkpath File.dirname(parameters[:executable_file])
 				
 				build build_prefix: parameters[:prefix], source_files: parameters[:source_files], executable_file: parameters[:executable_file]
-			end
-		end
-		
-		define Rule, "run.executable" do
-			input :executable_file
-			
-			parameter :prefix, implicit: true do |arguments|
-				arguments[:prefix] ||= File.dirname(arguments[:executable_file])
-			end
-			
-			parameter :arguments, optional: true
-			
-			apply do |parameters|
-				run!(
-					parameters[:executable_file],
-					*parameters[:arguments],
-					chdir: parameters[:prefix]
-				)
 			end
 		end
 	end
