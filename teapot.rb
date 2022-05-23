@@ -1,4 +1,3 @@
-
 #
 #  This file is part of the "Teapot" project, and is released under the MIT license.
 #
@@ -46,7 +45,7 @@ define_target "build-darwin" do |target|
 				object_files = parameters[:object_files].collect{|path| path.shortest_path(input_root)}
 				
 				run!(
-					environment[:cxx] || "clang++",
+					"clang++",
 					"-o", parameters[:executable_file].relative_path,
 					*object_files,
 					*environment[:ldflags],
@@ -59,7 +58,7 @@ define_target "build-darwin" do |target|
 			input :source_files
 			
 			parameter :prefix, implicit: true do |arguments|
-				arguments[:prefix] = environment[:build_prefix] + environment.checksum
+				arguments[:prefix] = environment[:build_path] + environment.checksum
 			end
 			
 			parameter :static_library
@@ -80,7 +79,7 @@ define_target "build-darwin" do |target|
 			input :source_files
 			
 			parameter :prefix, implicit: true do |arguments|
-				arguments[:prefix] = environment[:build_prefix] + environment.checksum
+				arguments[:prefix] = environment[:build_path] + environment.checksum
 			end
 			
 			parameter :executable
