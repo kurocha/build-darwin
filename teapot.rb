@@ -5,8 +5,6 @@
 teapot_version "3.0"
 
 define_target "build-darwin" do |target|
-	target.depends :platform, public: true
-	
 	target.provides :linker => "Build/darwin"
 	
 	target.provides "Build/darwin" do
